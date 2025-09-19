@@ -1,0 +1,77 @@
+{% extends "persistent.html" %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content%}
+  <div class="container">
+    <form method="POST">
+        <input type="text" name="text_to_process" id="textInput" placeholder="Введите текст. Лучше всего использовать грамотные тексты новостного жанра" style="width: 100%; padding: 8px;">
+        <div class="buttons">
+        <button type="submit" formaction="/get_sentences">Вывести предложения</button>
+        <button type="submit" formaction="/lemmatize">Лемматизировать</button>
+        <button type="submit" formaction="/get_entities">Найти именованные сущности</button>
+        <button type="submit" formaction="/get_grammar">Морфологический разбор</button>
+        <button type="submit" formaction="/get_syntax">Синтаксический разбор</button>
+        </div>
+    </form>
+    <div id="output">
+
+        {% for line in lines %}
+          <p>{{ line }}</p>
+        {% endfor %}
+
+        {% if lemmatized_text %}
+          <p>{{ lemmatized_text }}</p>
+        {% endif %}
+
+        {% if people or locations or organizations %}
+          {{ annotated_text|safe }}
+          <h2>Найденные сущности:</h2>
+          {% if people %}
+            <h3 class="list">Люди (PER)</h3>
+            {% for person in people %}
+              <p>{{ person }}</p>
+            {% endfor %}
+          {% endif %}
+          {% if locations %}
+            <h3 class="list">Места (LOC)</h3>
+            {% for location in locations %}
+              <p>{{ location }}</p>
+            {% endfor %}
+          {% endif %}
+          {% if organizations %}
+            <h3 class="list">Организации (ORG)</h3>
+            {% for organization in organizations %}
+              <p>{{ organization }}</p>
+            {% endfor %}
+          {% endif %}
+        {% endif %}
+
+        {% if syntax %}
+        <div class="tree">
+          {% for line in syntax %}
+            {{ line }}
+          {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% if grammar %} 
+        <table>
+          <tr>
+            <th>Слово</th>
+            <th>Часть речи</th>
+            <th>Граммема</th>
+          </tr>
+          {% for lex in grammar %}
+          <tr>
+            <td>{{ lex[0] }}</td>
+            <td>{{ lex [1] }}</td>
+            <td>{{ lex[2] }}</td>
+          </tr>
+
+          {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+  </div>
+{% endblock %}
